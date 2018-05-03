@@ -2,7 +2,7 @@
  * @Author: Guoquan Wei 1940359148@qq.com 
  * @Date: 2018-05-03 21:03:48 
  * @Last Modified by: Guoquan Wei
- * @Last Modified time: 2018-05-03 21:40:54
+ * @Last Modified time: 2018-05-03 21:43:26
  */
 
 #include <reg52.h>
@@ -246,35 +246,35 @@ void cleanpastcursor(int i, int j)
 int main()
 {
 	uchar i,k;
-	uchar ST[]="ST:     R:none  ";
-	uchar AT[]="AT:     R:24-25 ";
-	uchar SH[]="SH:     R:45-50 ";
-	uchar AH[]="AH:     R:20-30 ";
+	uchar ST[]="ST:     R:none ";
+	uchar AT[]="AT:     R:24-25";
+	uchar SH[]="SH:     R:45-50";
+	uchar AH[]="AH:     R:20-30";
 	delay(10); //延时
 	wela = 0;
 	dula = 0;
 	lcd_init(); //初始化LCD
 
 	lcd_pos(0, 0); //设置显示位置为第四行的第1个字符
-	for (k = 0; k < 16; k++)
+	for (k = 0; k < 15; k++)
 	{
 		lcd_wdat(ST[k]);
 	}
 
 	lcd_pos(1, 0); //设置显示位置为第四行的第1个字符
-	for (k = 0; k < 16; k++)
+	for (k = 0; k < 15; k++)
 	{
 		lcd_wdat(SH[k]);
 	}
 
 	lcd_pos(2, 0); //设置显示位置为第四行的第1个字符
-	for (k = 0; k < 16; k++)
+	for (k = 0; k < 15; k++)
 	{
 		lcd_wdat(AT[k]);
 	}
 
 	lcd_pos(3, 0); //设置显示位置为第四行的第1个字符
-	for (k = 0; k < 16; k++)
+	for (k = 0; k < 15; k++)
 	{
 		lcd_wdat(AH[k]);
 	}
