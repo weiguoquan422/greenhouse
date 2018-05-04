@@ -19,6 +19,10 @@ sbit wela = P2 ^ 6;
 sbit dula = P2 ^ 7;
 sbit DQ = P1 ^ 0;   //ds18b20信号位
 sbit Data = P1 ^ 1; //定义dh11数据线
+sbit key1 = P3 ^ 4;
+sbit key2 = P3 ^ 5;
+sbit key3 = P3 ^ 6;
+sbit key4 = P3 ^ 7;
 
 #define delayNOP() \
 	;              \
@@ -412,10 +416,61 @@ void DHT11_receive() //接收40位的数据
 		/*数据处理，方便显示*/
 		AH[3] = '0' + (RH / 10);
 		AH[4] = '0' + (RH % 10);
-		AH[6] = '0' + (int)(RL * 0.0039 * 10.0 );//显示小数位
+		AH[6] = '0' + (int)(RL * 0.0039 * 10.0); //显示小数位
 		AT[3] = '0' + (TH / 10);
 		AT[4] = '0' + (TH % 10);
-		AT[6] = '0' + (int)(TL * 0.0039 * 10.0 );//显示小数位
+		AT[6] = '0' + (int)(TL * 0.0039 * 10.0); //显示小数位
+	}
+}
+
+void keyscan() //按键扫描函数
+{
+	if (key1 == 0)
+	{
+		delayms(10);
+		if (key1 == 0)
+		{
+			num++;
+			if (num == 99)
+				num = 0;
+			while (!key1)
+				;
+		}
+	}
+
+	if (key2 == 0)
+	{
+		delayms(10);
+		if (key2 == 0)
+		{
+			num--;
+			if (num == 99)
+				num = 0;
+			while (!key2)
+				;
+		}
+	}
+
+	if (key3 == 0)
+	{
+		delayms(10);
+		if (key3 == 0)
+		{
+			num = 0;
+			while (!key3)
+				;
+		}
+	}
+
+	if (key4 == 0)
+	{
+		delayms(10);
+		if (key4 == 0)
+		{
+			TR0 = ~TR0;
+			while (!key4)
+				;
+		}
 	}
 }
 
