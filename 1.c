@@ -282,7 +282,7 @@ void Init_DS18B20(void)
 	delay_18b20(10);
 	x = DQ; //稍做延时后 如果x=0则初始化成功 x=1则初始化失败
 	delay_18b20(20);
-	DQ=1;
+	DQ = 1;
 }
 
 unsigned char ReadOneChar(void)
@@ -345,7 +345,7 @@ void loadSTcurrent()
 
 int main()
 {
-	uchar i, k;
+	uchar i, j, k;
 	delay(10); //延时
 	wela = 0;
 	dula = 0;
