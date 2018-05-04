@@ -17,7 +17,7 @@ sbit LCD_EN = P3 ^ 4;  //液晶使能控制
 sbit LCD_PSB = P3 ^ 7; //串/并方式控制
 sbit wela = P2 ^ 6;
 sbit dula = P2 ^ 7;
-sbit DQ = P3 ^ 0;
+sbit DQ = P1 ^ 0;
 
 #define delayNOP() \
 	;              \
@@ -339,10 +339,6 @@ void loadSTcurrent()
 /* 空气温度：ds18b20返回一个上百的数字，把这个数字转换成字符 */
 {
 	ST[3] = STcurrent / 100 + 48;
-	if (ST[3]=='0')
-	{
-		ST[3]=' ';
-	}
 	ST[4] = (STcurrent / 10) % 10 + 48;
 	ST[6] = STcurrent % 10 + 48;
 }
@@ -385,5 +381,6 @@ int main()
 		{
 			lcd_wdat(AH[k]);
 		}
+		delayms(300);
 	}
 }
