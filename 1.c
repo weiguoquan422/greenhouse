@@ -15,8 +15,7 @@ sbit LCD_RS = P3 ^ 5;  //寄存器选择输入
 sbit LCD_RW = P3 ^ 6;  //液晶读/写控制
 sbit LCD_EN = P3 ^ 4;  //液晶使能控制
 sbit LCD_PSB = P3 ^ 7; //串/并方式控制
-sbit wela = P2 ^ 6;
-sbit dula = P2 ^ 7;
+
 sbit DQ = P1 ^ 0;   //ds18b20信号位
 sbit Data = P1 ^ 1; //定义dh11数据线
 sbit key1 = P3 ^ 4;
