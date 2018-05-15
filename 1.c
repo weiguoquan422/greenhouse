@@ -18,6 +18,7 @@ sbit LCD_PSB = P3 ^ 7; //串/并方式控制
 
 sbit DQ = P1 ^ 0;   //ds18b20信号位
 sbit Data = P1 ^ 1; //定义dh11数据线
+
 sbit key1 = P3 ^ 4;
 sbit key2 = P3 ^ 5;
 sbit key3 = P3 ^ 6;
@@ -32,7 +33,7 @@ sbit key4 = P3 ^ 7;
 		_nop_();   \
 	};
 
-uchar row, column;
+uchar row, column, num;
 uchar STcurrent;
 uchar ST[] = "ST:  .  R:none ";
 uchar AT[] = "AT:  .  R:24-25";
@@ -114,34 +115,9 @@ void lcd_wdat(uchar dat)
 	LCD_EN = 0;
 }
 
-void initphoto()
-{
-	uchar i, j;
-	lcd_wcmd(0x34); //写数据时,关闭图形显示
-	for (i = 0; i < 32; i++)
-	{
-		lcd_wcmd(0x80 + i);		 //先写入水平坐标值
-		lcd_wcmd(0x80);			 //写入垂直坐标值
-		for (j = 0; j < 16; j++) //再写入两个8位元的数据
-			lcd_wdat(0x00);
-		delay(2);
-	}
-
-	for (i = 0; i < 32; i++)
-	{
-		lcd_wcmd(0x80 + i);		 //先写入水平坐标值
-		lcd_wcmd(0x88);			 //写入垂直坐标值
-		for (j = 0; j < 16; j++) //再写入两个8位元的数据
-			lcd_wdat(0x00);
-		delay(2);
-	}
-	lcd_wcmd(0x36); //写完数据,开图形显示
-}
-
 void lcd_init()
 {
-	LCD_PSB = 1; //并口方式
-	initphoto();
+	LCD_PSB = 1;	//并口方式
 	lcd_wcmd(0x31); //扩展指令操作
 	delay(5);
 	lcd_wcmd(0x01);
@@ -286,7 +262,6 @@ void Init_DS18B20(void)
 	delay_18b20(10);
 	x = DQ; //稍做延时后 如果x=0则初始化成功 x=1则初始化失败
 	delay_18b20(20);
-	DQ = 1;
 }
 
 unsigned char ReadOneChar(void)
@@ -475,13 +450,11 @@ void keyscan() //按键扫描函数
 
 int main()
 {
-	uchar i, j, k;
-	delay(10); //延时
-	wela = 0;
-	dula = 0;
+	uchar k;
+	delay(10); //延时函数
 
-	lcd_init(); //初始化LCD
-	Init_DS18B20();
+	lcd_init();		//初始化LCD
+	Init_DS18B20(); //初始化DS18B20
 
 	while (1)
 	{
@@ -490,29 +463,29 @@ int main()
 
 		DHT11_receive();
 
-		lcd_pos(0, 0); //设置显示位置为第四行的第1个字符
+		lcd_pos(0, 0); //设置显示位置为第1行的第1个字符
 		for (k = 0; k < 15; k++)
 		{
 			lcd_wdat(ST[k]);
 		}
 
-		lcd_pos(1, 0); //设置显示位置为第四行的第1个字符
+		lcd_pos(1, 0); //设置显示位置为第2行的第1个字符
 		for (k = 0; k < 15; k++)
 		{
 			lcd_wdat(SH[k]);
 		}
 
-		lcd_pos(2, 0); //设置显示位置为第四行的第1个字符
+		lcd_pos(2, 0); //设置显示位置为第3行的第1个字符
 		for (k = 0; k < 15; k++)
 		{
 			lcd_wdat(AT[k]);
 		}
 
-		lcd_pos(3, 0); //设置显示位置为第四行的第1个字符
+		lcd_pos(3, 0); //设置显示位置为第4行的第1个字符
 		for (k = 0; k < 15; k++)
 		{
 			lcd_wdat(AH[k]);
 		}
-		delayms(1500);
+		delayms(1500); //延时1.5秒
 	}
 }
