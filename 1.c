@@ -33,12 +33,12 @@ sbit key4 = P3 ^ 7;
 		_nop_();   \
 	};
 
-uchar row, column, num;
+uchar num = 0;
 uchar STcurrent;
-uchar ST[] = "ST:  .  R:none ";
-uchar AT[] = "AT:  .  R:24-25";
-uchar SH[] = "SH:  .  R:45-50";
-uchar AH[] = "AH:  .  R:20-30";
+uchar ST[] = "ST:  .  R: none ";
+uchar AT[] = "AT:  .  R:24--25";
+uchar SH[] = "SH:  .  R:45--50";
+uchar AH[] = "AH:  .  R:20--30";
 
 void delay(int ms)
 {
@@ -117,17 +117,18 @@ void lcd_wdat(uchar dat)
 
 void lcd_init()
 {
+	LCD_RS = 0;
+	LCD_RW = 0;
 	LCD_PSB = 1;	//并口方式
 	lcd_wcmd(0x31); //扩展指令操作
 	delay(5);
-	lcd_wcmd(0x01);
+	lcd_wcmd(0x01); //清除显示
 	delay(5);
-	LCD_RS = 0;
-	LCD_RW = 0;
-	lcd_wcmd(0x0c);
+	lcd_wcmd(0x0d);
+	//显示开，关游标，但开光标位置，即光标会显示，但不会随着输入自动变化位置。对之后键盘控制很重要
 	delay(5);
 
-	/*lcd_wcmd(0x0f); //显示开，关光标
+	/*lcd_wcmd(0x0f); //显示开，开光标
 	delay(5);
 	lcd_wcmd(0x01);		   //清除LCD的显示内容
 	delay(5);*/
@@ -315,14 +316,45 @@ void DHT11_receive() //接收40位的数据
 
 void keyscan() //按键扫描函数
 {
+	key1 = key2 = key3 = key4 = 1;
 	if (key1 == 0)
 	{
 		delayms(10);
 		if (key1 == 0)
 		{
 			num++;
-			if (num == 99)
+			if (num == 0)
+			{
+				lcd_wcmd(0x0c);
+			}
+			else if (num == 1)
+			{
+				lcd_pos(1, 5);
+			}
+			else if (num == 2)
+			{
+				lcd_pos(1, 7);
+			}
+			else if (num == 3)
+			{
+				lcd_pos(2, 5);
+			}
+			else if (num == 4)
+			{
+				lcd_pos(2, 7);
+			}
+			else if (num == 5)
+			{
+				lcd_pos(3, 5);
+			}
+			else if (num == 6)
+			{
+				lcd_pos(3, 7);
+			}
+			else if (num == 7)
+			{
 				num = 0;
+			}
 			while (!key1)
 				;
 		}
@@ -376,32 +408,32 @@ int main()
 	{
 		STcurrent = ReadTemperature();
 		loadSTcurrent();
-
 		DHT11_receive();
+		keyscan();
 
-		lcd_pos(0, 0); //设置显示位置为第1行的第1个字符
-		for (k = 0; k < 15; k++)
+		if (num == 0)
 		{
-			lcd_wdat(ST[k]);
+			lcd_pos(0, 0); //设置显示位置为第1行的第1个字符
+			for (k = 0; k < 16; k++)
+			{
+				lcd_wdat(ST[k]);
+			}
+			lcd_pos(1, 0); //设置显示位置为第2行的第1个字符
+			for (k = 0; k < 16; k++)
+			{
+				lcd_wdat(SH[k]);
+			}
+			lcd_pos(2, 0); //设置显示位置为第3行的第1个字符
+			for (k = 0; k < 16; k++)
+			{
+				lcd_wdat(AT[k]);
+			}
+			lcd_pos(3, 0); //设置显示位置为第4行的第1个字符
+			for (k = 0; k < 16; k++)
+			{
+				lcd_wdat(AH[k]);
+			}
+			delayms(1500); //延时1.5秒
 		}
-
-		lcd_pos(1, 0); //设置显示位置为第2行的第1个字符
-		for (k = 0; k < 15; k++)
-		{
-			lcd_wdat(SH[k]);
-		}
-
-		lcd_pos(2, 0); //设置显示位置为第3行的第1个字符
-		for (k = 0; k < 15; k++)
-		{
-			lcd_wdat(AT[k]);
-		}
-
-		lcd_pos(3, 0); //设置显示位置为第4行的第1个字符
-		for (k = 0; k < 15; k++)
-		{
-			lcd_wdat(AH[k]);
-		}
-		delayms(1500); //延时1.5秒
 	}
 }
