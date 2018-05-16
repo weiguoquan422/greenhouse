@@ -34,11 +34,23 @@ sbit key4 = P3 ^ 7;
 	};
 
 uchar num = 0;
+uchar SHmin = 70, SHmax = 80, ATmin = 27, ATmax = 29, AHmin = 40, AHmax = 50;
 uchar STcurrent;
-uchar ST[] = "ST:  .  R: none ";
-uchar AT[] = "AT:  .  R:24--25";
-uchar SH[] = "SH:  .  R:45--50";
-uchar AH[] = "AH:  .  R:20--30";
+uchar ST[] = "ST:  . ";
+uchar SH[] = "SH:  . ";
+uchar AT[] = "AT:  . ";
+uchar AH[] = "AH:  . ";
+uchar STrange[] = "R: none ";
+uchar SHrange[] = "R:45--50";
+uchar ATrange[] = "R:24--25";
+uchar AHrange[] = "R:20--30";
+
+void trans_num_to_char(uchar a, uchar *s)
+/* 将数字如SHmin转行到字符数字SH中的对应位置 */
+{
+	*s = a / 10 + 48;
+	*(s + 1) = a % 10 + 48;
+}
 
 void delay(int ms)
 {
@@ -115,25 +127,6 @@ void lcd_wdat(uchar dat)
 	LCD_EN = 0;
 }
 
-void lcd_init()
-{
-	LCD_RS = 0;
-	LCD_RW = 0;
-	LCD_PSB = 1;	//并口方式
-	lcd_wcmd(0x31); //扩展指令操作
-	delay(5);
-	lcd_wcmd(0x01); //清除显示
-	delay(5);
-	lcd_wcmd(0x0d);
-	//显示开，关游标，但开光标位置，即光标会显示，但不会随着输入自动变化位置。对之后键盘控制很重要
-	delay(5);
-
-	/*lcd_wcmd(0x0f); //显示开，开光标
-	delay(5);
-	lcd_wcmd(0x01);		   //清除LCD的显示内容
-	delay(5);*/
-}
-
 /*********************************************************/
 /*                                                       */
 /* 设定显示位置                                          */
@@ -161,6 +154,51 @@ void lcd_pos(uchar X, uchar Y)
 	pos = X + Y;
 	lcd_wcmd(pos); //显示地址
 }
+
+void printrange()
+{
+	uchar k;
+	lcd_pos(0, 4); //设置显示位置为第1行的第1个字符
+	for (k = 0; k < 8; k++)
+	{
+		lcd_wdat(STrange[k]);
+	}
+	lcd_pos(1, 4); //设置显示位置为第2行的第1个字符
+	for (k = 0; k < 8; k++)
+	{
+		lcd_wdat(SHrange[k]);
+	}
+	lcd_pos(2, 4); //设置显示位置为第3行的第1个字符
+	for (k = 0; k < 8; k++)
+	{
+		lcd_wdat(ATrange[k]);
+	}
+	lcd_pos(3, 4); //设置显示位置为第4行的第1个字符
+	for (k = 0; k < 8; k++)
+	{
+		lcd_wdat(AHrange[k]);
+	}
+}
+
+void lcd_init()
+{
+	LCD_RS = 0;
+	LCD_RW = 0;
+	LCD_PSB = 1;	//并口方式
+	lcd_wcmd(0x31); //扩展指令操作
+	delay(5);
+	lcd_wcmd(0x01); //清除显示
+	delay(5);
+	lcd_wcmd(0x0d);
+	//显示开，关游标，但开光标位置，即光标会显示，但不会随着输入自动变化位置。对之后键盘控制很重要
+	delay(5);
+	printrange();
+	/*lcd_wcmd(0x0f); //显示开，开光标
+	delay(5);
+	lcd_wcmd(0x01);		   //清除LCD的显示内容
+	delay(5);*/
+}
+
 
 void delayms(int x)
 {
@@ -318,6 +356,7 @@ void keyscan() //按键扫描函数
 {
 	key1 = key2 = key3 = key4 = 1;
 	if (key1 == 0)
+	/* key1按下后，每个num对应不同的光标位置 */
 	{
 		delayms(10);
 		if (key1 == 0)
@@ -365,9 +404,52 @@ void keyscan() //按键扫描函数
 		delayms(10);
 		if (key2 == 0)
 		{
-			num--;
-			if (num == 99)
-				num = 0;
+			if (num == 0)
+			{
+				lcd_wcmd(0x0c);
+			}
+			else if (num == 1)
+			{
+				SHmin++;
+				trans_num_to_char(SHmin,SHrange+2);
+				printrange();
+				lcd_pos(1,5);
+			}
+			else if (num == 2)
+			{
+				SHmax++;
+				trans_num_to_char(SHmax,SHrange+6);
+				printrange();
+				lcd_pos(1,7);
+			}
+			else if (num == 3)
+			{
+				ATmin++;
+				trans_num_to_char(ATmin,ATrange+4);
+				printrange();
+				lcd_pos(2,5);
+			}
+			else if (num == 4)
+			{
+				ATmax++;
+				trans_num_to_char(ATmax,ATrange+6);
+				printrange();
+				lcd_pos(2,7);
+			}
+			else if (num == 5)
+			{
+				AHmin++;
+				trans_num_to_char(AHmin,AHrange+4);
+				printrange();
+				lcd_pos(3,5);
+			}
+			else if (num == 6)
+			{
+				AHmax++;
+				trans_num_to_char(AHmax,AHrange+6);
+				printrange();
+				lcd_pos(3,7);
+			}
 			while (!key2)
 				;
 		}
@@ -378,7 +460,52 @@ void keyscan() //按键扫描函数
 		delayms(10);
 		if (key3 == 0)
 		{
-			num = 0;
+			if (num == 0)
+			{
+				lcd_wcmd(0x0c);
+			}
+			else if (num == 1)
+			{
+				SHmin--;
+				trans_num_to_char(SHmin,SHrange+2);
+				printrange();
+				lcd_pos(1,5);
+			}
+			else if (num == 2)
+			{
+				SHmax--;
+				trans_num_to_char(SHmax,SHrange+6);
+				printrange();
+				lcd_pos(1,7);
+			}
+			else if (num == 3)
+			{
+				ATmin--;
+				trans_num_to_char(ATmin,ATrange+4);
+				printrange();
+				lcd_pos(2,5);
+			}
+			else if (num == 4)
+			{
+				ATmax--;
+				trans_num_to_char(ATmax,ATrange+6);
+				printrange();
+				lcd_pos(2,7);
+			}
+			else if (num == 5)
+			{
+				AHmin--;
+				trans_num_to_char(AHmin,AHrange+4);
+				printrange();
+				lcd_pos(3,5);
+			}
+			else if (num == 6)
+			{
+				AHmax--;
+				trans_num_to_char(AHmax,AHrange+6);
+				printrange();
+				lcd_pos(3,7);
+			}
 			while (!key3)
 				;
 		}
@@ -389,7 +516,6 @@ void keyscan() //按键扫描函数
 		delayms(10);
 		if (key4 == 0)
 		{
-			TR0 = ~TR0;
 			while (!key4)
 				;
 		}
@@ -408,31 +534,33 @@ int main()
 	{
 		STcurrent = ReadTemperature();
 		loadSTcurrent();
+		/* 读取温度，并把st转成字符数字，加载近去 */
 		DHT11_receive();
 		keyscan();
 
 		if (num == 0)
 		{
 			lcd_pos(0, 0); //设置显示位置为第1行的第1个字符
-			for (k = 0; k < 16; k++)
+			for (k = 0; k < 7; k++)
 			{
 				lcd_wdat(ST[k]);
 			}
 			lcd_pos(1, 0); //设置显示位置为第2行的第1个字符
-			for (k = 0; k < 16; k++)
+			for (k = 0; k < 7; k++)
 			{
 				lcd_wdat(SH[k]);
 			}
 			lcd_pos(2, 0); //设置显示位置为第3行的第1个字符
-			for (k = 0; k < 16; k++)
+			for (k = 0; k < 7; k++)
 			{
 				lcd_wdat(AT[k]);
 			}
 			lcd_pos(3, 0); //设置显示位置为第4行的第1个字符
-			for (k = 0; k < 16; k++)
+			for (k = 0; k < 7; k++)
 			{
 				lcd_wdat(AH[k]);
 			}
+			lcd_pos(3,8);
 			delayms(1500); //延时1.5秒
 		}
 	}
