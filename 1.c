@@ -16,8 +16,8 @@ sbit LCD_RW = P3 ^ 6;  //液晶读/写控制
 sbit LCD_EN = P3 ^ 4;  //液晶使能控制
 sbit LCD_PSB = P3 ^ 7; //串/并方式控制
 
-sbit DQ = P1 ^ 0;   //ds18b20信号位
-sbit Data = P1 ^ 1; //定义dh11数据线
+sbit DQ = P1 ^ 1;   //ds18b20信号位
+sbit Data = P1 ^ 0; //定义dh11数据线
 
 sbit key1 = P3 ^ 4;
 sbit key2 = P3 ^ 5;
@@ -161,82 +161,6 @@ void lcd_pos(uchar X, uchar Y)
 	lcd_wcmd(pos); //显示地址
 }
 
-void printcursor()
-// 打印光标函数
-{
-	lcd_wcmd(0x34);
-	delay(2);
-	if (row == 0 || row == 1)
-	{
-		lcd_wcmd(0x80 + 14 + 16 * row);
-		delay(2);
-		lcd_wcmd(0x80 + column / 2);
-		delay(2);
-		if (column % 2 == 0)
-		{
-			lcd_wdat(0x7f);
-			delay(2);
-			lcd_wdat(0x00);
-		}
-		else
-		{
-			lcd_wdat(0x00);
-			delay(2);
-			lcd_wdat(0x7f);
-		}
-	}
-	else if (row == 2 || row == 3)
-	{
-		lcd_wcmd(0x80 + 14 + 16 * (row - 2));
-		delay(2);
-		lcd_wcmd(0x88 + column / 2);
-		delay(2);
-		if (column % 2 == 0)
-		{
-			lcd_wdat(0x7f);
-			delay(2);
-			lcd_wdat(0x00);
-		}
-		else
-		{
-			lcd_wdat(0x00);
-			delay(2);
-			lcd_wdat(0x7f);
-			delay(2);
-		}
-	}
-	lcd_wcmd(0x36);
-}
-
-void cleanpastcursor(int i, int j)
-// 光标移动后，将上一个光标显示清除掉
-{
-	lcd_wcmd(0x34);
-	delay(2);
-	if (i == 0 || i == 1)
-	{
-		lcd_wcmd(0x80 + 14 + 16 * i);
-		delay(2);
-		lcd_wcmd(0x80 + j / 2);
-		delay(2);
-		lcd_wdat(0x00);
-		delay(2);
-		lcd_wdat(0x00);
-	}
-	else if (i == 2 || i == 3)
-	{
-		lcd_wcmd(0x80 + 14 + 16 * (i - 2));
-		delay(2);
-		lcd_wcmd(0x88 + j / 2);
-		delay(2);
-		lcd_wdat(0x00);
-		delay(2);
-		lcd_wdat(0x00);
-		delay(2);
-	}
-	lcd_wcmd(0x36);
-}
-
 void delayms(int x)
 {
 	int i, j;
@@ -328,20 +252,12 @@ void DHT11_delay_us(uchar n)
 		;
 }
 
-void DHT11_delay_ms(uint z)
-{
-	uint i, j;
-	for (i = z; i > 0; i--)
-		for (j = 110; j > 0; j--)
-			;
-}
-
 void DHT11_start()
 {
 	Data = 1;
 	DHT11_delay_us(2);
 	Data = 0;
-	DHT11_delay_ms(20); //延时18ms以上
+	delayms(20); //延时18ms以上
 	Data = 1;
 	DHT11_delay_us(30);
 }
