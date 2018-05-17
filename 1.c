@@ -2,7 +2,7 @@
  * @Author: Guoquan Wei 1940359148@qq.com 
  * @Date: 2018-05-03 21:03:48 
  * @Last Modified by: Guoquan Wei
- * @Last Modified time: 2018-05-03 22:35:01
+ * @Last Modified time: 2018-05-17 11:12:43
  */
 
 #include <reg52.h>
@@ -16,10 +16,10 @@ sbit LCD_RW = P3 ^ 6;  //液晶读/写控制
 sbit LCD_EN = P3 ^ 4;  //液晶使能控制
 sbit LCD_PSB = P3 ^ 7; //串/并方式控制
 
-sbit Buzzer = P2 ^ 0;//蜂鸣器
-sbit Data = P2 ^ 1; //定义dh11数据线at and ah
-sbit SH = P2 ^ 2;//土壤湿度模块
-sbit DQ = P2 ^ 3; //ds18b20信号位st
+sbit Buzzer = P2 ^ 0; //蜂鸣器
+sbit Data = P2 ^ 1;   //定义dh11数据线at and ah
+sbit SH = P2 ^ 2;	 //土壤湿度模块
+sbit DQ = P2 ^ 3;	 //ds18b20信号位st
 
 sbit key1 = P1 ^ 4;
 sbit key2 = P1 ^ 5;
@@ -42,7 +42,7 @@ sbit Pump = P1 ^ 3;
 
 uchar num = 0;
 uchar SHmin = 70, SHmax = 80, ATmin = 27, ATmax = 29, AHmin = 40, AHmax = 50;
-uchar STcurrent, AHcurrent, ATcurrent;
+uchar STcurrent, AHcurrent, ATcurrent, SHcurrent;
 uchar ST[] = "ST:  . ";
 uchar SH[] = "SH:  . ";
 uchar AT[] = "AT:  . ";
@@ -528,6 +528,50 @@ void keyscan() //按键扫描函数
 	}
 }
 
+void compare()
+{
+	if (SHcurrent < SHmin)
+	{
+		Pump = 0;
+	}
+	else if (STcurrent > SHmax)
+	{
+		Pump = 1;
+	}
+	else if (SHcurrent >= SHmin && SHcurrent <= SHmax)
+	{
+		Pump = 1;
+	}
+
+	if (ATcurrent < ATmin)
+	{
+		Heater = 0;
+	}
+	else if (ATcurrent > ATmax)
+	{
+		Air_blower = 0;
+	}
+	else if (ATcurrent >= ATmin && ATcurrent <= ATmax)
+	{
+		Air_blower = 1;
+		Heater = 1;
+	}
+
+	if (AHcurrent < AHmin)
+	{
+		Sprayer = 0;
+	}
+	else if (AHcurrent > AHmax)
+	{
+		Air_blower = 0;
+	}
+	else if (AHcurrent >= AHmin && AHcurrent <= AHmax)
+	{
+		Sprayer = 1;
+		Air_blower = 1;
+	}
+}
+
 int main()
 {
 	uchar k;
@@ -538,14 +582,16 @@ int main()
 
 	while (1)
 	{
-		STcurrent = ReadTemperature();
-		loadSTcurrent();
-		/* 读取温度，并把st转成字符数字，加载近去 */
-		DHT11_receive();
 		keyscan();
 
 		if (num == 0)
+		/* num=0时，温室处于工作状态，num不等于0时，处于设定range状态，温室不工作 */
 		{
+			STcurrent = ReadTemperature();
+			loadSTcurrent();
+			/* 读取温度，并把st转成字符数字，加载近去 */
+			DHT11_receive();
+			compare();
 			lcd_pos(0, 0); //设置显示位置为第1行的第1个字符
 			for (k = 0; k < 7; k++)
 			{
@@ -566,7 +612,7 @@ int main()
 			{
 				lcd_wdat(AH[k]);
 			}
-			lcd_pos(3, 8);//将光标移动到显示区域外，防止乱码出现
+			lcd_pos(3, 8); //将光标移动到显示区域外，防止乱码出现
 			delayms(1500); //延时1.5秒
 		}
 	}
