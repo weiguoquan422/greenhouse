@@ -16,13 +16,20 @@ sbit LCD_RW = P3 ^ 6;  //液晶读/写控制
 sbit LCD_EN = P3 ^ 4;  //液晶使能控制
 sbit LCD_PSB = P3 ^ 7; //串/并方式控制
 
-sbit DQ = P1 ^ 1;   //ds18b20信号位
-sbit Data = P1 ^ 0; //定义dh11数据线
+sbit Buzzer = P2 ^ 0;//蜂鸣器
+sbit Data = P2 ^ 1; //定义dh11数据线at and ah
+sbit SH = P2 ^ 2;//土壤湿度模块
+sbit DQ = P2 ^ 3; //ds18b20信号位st
 
-sbit key1 = P3 ^ 4;
-sbit key2 = P3 ^ 5;
-sbit key3 = P3 ^ 6;
-sbit key4 = P3 ^ 7;
+sbit key1 = P1 ^ 4;
+sbit key2 = P1 ^ 5;
+sbit key3 = P1 ^ 6;
+sbit key4 = P1 ^ 7;
+
+sbit Heater = P1 ^ 0;
+sbit Air_blower = P1 ^ 1;
+sbit Sprayer = P1 ^ 2;
+sbit Pump = P1 ^ 3;
 
 #define delayNOP() \
 	;              \
@@ -35,7 +42,7 @@ sbit key4 = P3 ^ 7;
 
 uchar num = 0;
 uchar SHmin = 70, SHmax = 80, ATmin = 27, ATmax = 29, AHmin = 40, AHmax = 50;
-uchar STcurrent;
+uchar STcurrent, AHcurrent, ATcurrent;
 uchar ST[] = "ST:  . ";
 uchar SH[] = "SH:  . ";
 uchar AT[] = "AT:  . ";
@@ -199,7 +206,6 @@ void lcd_init()
 	delay(5);*/
 }
 
-
 void delayms(int x)
 {
 	int i, j;
@@ -320,7 +326,7 @@ uchar DHT11_rec_byte() //接收一个字节
 
 void DHT11_receive() //接收40位的数据
 {
-	uchar R_H, R_L, T_H, T_L, RH, RL, TH, TL, revise;
+	uchar R_H, R_L, T_H, T_L, RL, TL, revise;
 	DHT11_start();
 	if (Data == 0)
 	{
@@ -337,17 +343,17 @@ void DHT11_receive() //接收40位的数据
 
 		if ((R_H + R_L + T_H + T_L) == revise) //校正
 		{
-			RH = R_H;
+			AHcurrent = R_H;
 			RL = R_L;
-			TH = T_H;
+			ATcurrent = T_H;
 			TL = T_L;
 		}
 		/*数据处理，方便显示*/
-		AH[3] = '0' + (RH / 10);
-		AH[4] = '0' + (RH % 10);
+		AH[3] = '0' + (AHcurrent / 10);
+		AH[4] = '0' + (AHcurrent % 10);
 		AH[6] = '0' + (int)(RL * 0.0039 * 10.0); //显示小数位
-		AT[3] = '0' + (TH / 10);
-		AT[4] = '0' + (TH % 10);
+		AT[3] = '0' + (ATcurrent / 10);
+		AT[4] = '0' + (ATcurrent % 10);
 		AT[6] = '0' + (int)(TL * 0.0039 * 10.0); //显示小数位
 	}
 }
@@ -411,44 +417,44 @@ void keyscan() //按键扫描函数
 			else if (num == 1)
 			{
 				SHmin++;
-				trans_num_to_char(SHmin,SHrange+2);
+				trans_num_to_char(SHmin, SHrange + 2);
 				printrange();
-				lcd_pos(1,5);
+				lcd_pos(1, 5);
 			}
 			else if (num == 2)
 			{
 				SHmax++;
-				trans_num_to_char(SHmax,SHrange+6);
+				trans_num_to_char(SHmax, SHrange + 6);
 				printrange();
-				lcd_pos(1,7);
+				lcd_pos(1, 7);
 			}
 			else if (num == 3)
 			{
 				ATmin++;
-				trans_num_to_char(ATmin,ATrange+4);
+				trans_num_to_char(ATmin, ATrange + 4);
 				printrange();
-				lcd_pos(2,5);
+				lcd_pos(2, 5);
 			}
 			else if (num == 4)
 			{
 				ATmax++;
-				trans_num_to_char(ATmax,ATrange+6);
+				trans_num_to_char(ATmax, ATrange + 6);
 				printrange();
-				lcd_pos(2,7);
+				lcd_pos(2, 7);
 			}
 			else if (num == 5)
 			{
 				AHmin++;
-				trans_num_to_char(AHmin,AHrange+4);
+				trans_num_to_char(AHmin, AHrange + 4);
 				printrange();
-				lcd_pos(3,5);
+				lcd_pos(3, 5);
 			}
 			else if (num == 6)
 			{
 				AHmax++;
-				trans_num_to_char(AHmax,AHrange+6);
+				trans_num_to_char(AHmax, AHrange + 6);
 				printrange();
-				lcd_pos(3,7);
+				lcd_pos(3, 7);
 			}
 			while (!key2)
 				;
@@ -467,44 +473,44 @@ void keyscan() //按键扫描函数
 			else if (num == 1)
 			{
 				SHmin--;
-				trans_num_to_char(SHmin,SHrange+2);
+				trans_num_to_char(SHmin, SHrange + 2);
 				printrange();
-				lcd_pos(1,5);
+				lcd_pos(1, 5);
 			}
 			else if (num == 2)
 			{
 				SHmax--;
-				trans_num_to_char(SHmax,SHrange+6);
+				trans_num_to_char(SHmax, SHrange + 6);
 				printrange();
-				lcd_pos(1,7);
+				lcd_pos(1, 7);
 			}
 			else if (num == 3)
 			{
 				ATmin--;
-				trans_num_to_char(ATmin,ATrange+4);
+				trans_num_to_char(ATmin, ATrange + 4);
 				printrange();
-				lcd_pos(2,5);
+				lcd_pos(2, 5);
 			}
 			else if (num == 4)
 			{
 				ATmax--;
-				trans_num_to_char(ATmax,ATrange+6);
+				trans_num_to_char(ATmax, ATrange + 6);
 				printrange();
-				lcd_pos(2,7);
+				lcd_pos(2, 7);
 			}
 			else if (num == 5)
 			{
 				AHmin--;
-				trans_num_to_char(AHmin,AHrange+4);
+				trans_num_to_char(AHmin, AHrange + 4);
 				printrange();
-				lcd_pos(3,5);
+				lcd_pos(3, 5);
 			}
 			else if (num == 6)
 			{
 				AHmax--;
-				trans_num_to_char(AHmax,AHrange+6);
+				trans_num_to_char(AHmax, AHrange + 6);
 				printrange();
-				lcd_pos(3,7);
+				lcd_pos(3, 7);
 			}
 			while (!key3)
 				;
@@ -560,7 +566,7 @@ int main()
 			{
 				lcd_wdat(AH[k]);
 			}
-			lcd_pos(3,8);
+			lcd_pos(3, 8);//将光标移动到显示区域外，防止乱码出现
 			delayms(1500); //延时1.5秒
 		}
 	}
