@@ -42,8 +42,8 @@ sbit Pump = P1 ^ 3;
 
 uchar num = 0;
 uchar SHmin = 70, SHmax = 80, ATmin = 27, ATmax = 29, AHmin = 40, AHmax = 50;
-unsigned int STcurrent,SHcurrent;
-uchar AHcurrent, ATcurrent;
+unsigned int STcurrent;
+uchar AHcurrent, ATcurrent, SHcurrent;
 uchar ST[] = "ST:  . ";
 uchar SH[] = "SH:  . ";
 uchar AT[] = "AT:  . ";
@@ -577,18 +577,42 @@ void compare()
 	}
 }
 
-void receive_SH()
+// void receive_SH()
+// {
+// 	bit tmp;
+// 	uchar i;
+// 	for (i=0 ; i<8 ; i++ )
+// 	{
+// 		tmp=SHdata;
+// 		SHcurrent=SHcurrent|tmp;
+// 		SHcurrent=SHcurrent<<1;
+// 		delayms(200);
+// 	}
+// 	if (SHcurrent==65535)
+// 	{
+// 		SHcurrent=0;
+// 	}
+// 	if (SHcurrent>0&&SHcurrent<65535)
+// 	{
+// 		SHcurrent=30;
+// 	}
+// 	if (SHcurrent==0)
+// 	{
+// 		SHcurrent=46;
+// 	}
+// }
+
+void Initial_com(void)
 {
-	bit tmp;
-	uchar i;
-	for (i=0 ; i<16 ; i++ )
-	{
-		tmp=SHdata;
-		SHcurrent=SHcurrent|tmp;
-		SHcurrent=SHcurrent<<1;
-		delayms(200);
-	}
-	SHcurrent=SHcurrent/66;
+	EA = 1;		 //开总中断
+	ES = 1;		 //允许串口中断
+	ET1 = 1;	 //允许定时器T1的中断
+	TMOD = 0x20; //定时器T1，在方式2中断产生波特率
+	PCON = 0x00; //SMOD=0
+	SCON = 0x50; // 方式1 由定时器控制
+	TH1 = 0xfd;  //波特率设置为9600
+	TL1 = 0xfd;
+	TR1 = 1; //开定时器T1运行控制位
 }
 
 int main()
@@ -598,7 +622,7 @@ int main()
 
 	lcd_init();		//初始化LCD
 	Init_DS18B20(); //初始化DS18B20
-
+	Initial_com();
 	while (1)
 	{
 		keyscan();
@@ -608,7 +632,12 @@ int main()
 		{
 			STcurrent = ReadTemperature();
 			loadcurrent(STcurrent, ST);
-			receive_SH();
+			// receive_SH();
+			if (RI)
+			{
+				SHcurrent = SBUF;
+				RI = 0;
+			}
 			loadcurrent(SHcurrent, SH);
 			/* 读取温度，并把st转成字符数字，加载近去 */
 			DHT11_receive();
@@ -635,7 +664,6 @@ int main()
 				lcd_wdat(AH[k]);
 			}
 			lcd_pos(3, 8); //将光标移动到显示区域外，防止乱码出现
-			delayms(1500); //延时1.5秒
 		}
 	}
 }
