@@ -2,7 +2,7 @@
  * @Author: Guoquan Wei 1940359148@qq.com 
  * @Date: 2018-05-03 21:03:48 
  * @Last Modified by: Guoquan Wei
- * @Last Modified time: 2018-05-17 11:12:43
+ * @Last Modified time: 2018-05-17 12:43:47
  */
 
 #include <reg52.h>
@@ -18,7 +18,7 @@ sbit LCD_PSB = P3 ^ 7; //串/并方式控制
 
 sbit Buzzer = P2 ^ 0; //蜂鸣器
 sbit Data = P2 ^ 1;   //定义dh11数据线at and ah
-sbit SH = P2 ^ 2;	 //土壤湿度模块
+sbit SHdata = P2 ^ 2; //土壤湿度模块
 sbit DQ = P2 ^ 3;	 //ds18b20信号位st
 
 sbit key1 = P1 ^ 4;
@@ -530,45 +530,49 @@ void keyscan() //按键扫描函数
 
 void compare()
 {
-	if (SHcurrent < SHmin)
+	if (SHcurrent <= SHmin)
 	{
 		Pump = 0;
+		Buzzer = 0;
 	}
-	else if (STcurrent > SHmax)
-	{
-		Pump = 1;
-	}
-	else if (SHcurrent >= SHmin && SHcurrent <= SHmax)
+	else
 	{
 		Pump = 1;
 	}
 
-	if (ATcurrent < ATmin)
+	if (ATcurrent <= ATmin)
 	{
 		Heater = 0;
+		Buzzer = 0;
 	}
-	else if (ATcurrent > ATmax)
+	else
 	{
-		Air_blower = 0;
-	}
-	else if (ATcurrent >= ATmin && ATcurrent <= ATmax)
-	{
-		Air_blower = 1;
 		Heater = 1;
 	}
 
-	if (AHcurrent < AHmin)
+	if (AHcurrent <= AHmin)
 	{
 		Sprayer = 0;
+		Buzzer = 0;
 	}
-	else if (AHcurrent > AHmax)
-	{
-		Air_blower = 0;
-	}
-	else if (AHcurrent >= AHmin && AHcurrent <= AHmax)
+	else
 	{
 		Sprayer = 1;
+	}
+
+	if (ATcurrent >= ATmax || AHcurrent >= AHmax)
+	{
+		Air_blower = 0;
+		Buzzer = 0;
+	}
+	else
+	{
 		Air_blower = 1;
+	}
+
+	if (SHcurrent > SHmin && SHcurrent < SHmax && ATcurrent > ATmin && ATcurrent < ATmax && AHcurrent > AHmin && AHcurrent < AHmax)
+	{
+		Buzzer = 1;
 	}
 }
 
