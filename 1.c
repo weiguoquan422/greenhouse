@@ -2,7 +2,7 @@
  * @Author: Guoquan Wei 1940359148@qq.com 
  * @Date: 2018-05-03 21:03:48 
  * @Last Modified by: Guoquan Wei
- * @Last Modified time: 2018-05-17 12:43:47
+ * @Last Modified time: 2018-05-17 13:51:40
  */
 
 #include <reg52.h>
@@ -42,7 +42,8 @@ sbit Pump = P1 ^ 3;
 
 uchar num = 0;
 uchar SHmin = 70, SHmax = 80, ATmin = 27, ATmax = 29, AHmin = 40, AHmax = 50;
-uchar STcurrent, AHcurrent, ATcurrent, SHcurrent;
+unsigned int STcurrent,SHcurrent;
+uchar AHcurrent, ATcurrent;
 uchar ST[] = "ST:  . ";
 uchar SH[] = "SH:  . ";
 uchar AT[] = "AT:  . ";
@@ -283,12 +284,12 @@ unsigned int ReadTemperature(void)
 	return (temp);
 }
 
-void loadSTcurrent()
+void loadcurrent(unsigned int a, uchar *p)
 /* 空气温度：ds18b20返回一个上百的数字，把这个数字转换成字符 */
 {
-	ST[3] = STcurrent / 100 + 48;
-	ST[4] = (STcurrent / 10) % 10 + 48;
-	ST[6] = STcurrent % 10 + 48;
+	*(p + 3) = a / 100 + 48;
+	*(p + 4) = (a / 10) % 10 + 48;
+	*(p + 6) = a % 10 + 48;
 }
 
 void DHT11_delay_us(uchar n)
@@ -576,6 +577,20 @@ void compare()
 	}
 }
 
+void receive_SH()
+{
+	bit tmp;
+	uchar i;
+	for (i=0 ; i<16 ; i++ )
+	{
+		tmp=SHdata;
+		SHcurrent=SHcurrent|tmp;
+		SHcurrent=SHcurrent<<1;
+		delayms(200);
+	}
+	SHcurrent=SHcurrent/66;
+}
+
 int main()
 {
 	uchar k;
@@ -592,10 +607,13 @@ int main()
 		/* num=0时，温室处于工作状态，num不等于0时，处于设定range状态，温室不工作 */
 		{
 			STcurrent = ReadTemperature();
-			loadSTcurrent();
+			loadcurrent(STcurrent, ST);
+			receive_SH();
+			loadcurrent(SHcurrent, SH);
 			/* 读取温度，并把st转成字符数字，加载近去 */
 			DHT11_receive();
 			compare();
+
 			lcd_pos(0, 0); //设置显示位置为第1行的第1个字符
 			for (k = 0; k < 7; k++)
 			{
