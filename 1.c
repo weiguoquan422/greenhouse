@@ -41,7 +41,7 @@ sbit Pump = P1 ^ 3;
 	};
 
 uchar num = 0;
-uchar SHmin = 40, SHmax = 80, ATmin = 20, ATmax = 30, AHmin = 40, AHmax = 70;
+uchar SHmin = 20, SHmax = 80, ATmin = 20, ATmax = 30, AHmin = 10, AHmax = 70;
 unsigned int STcurrent;
 uchar AHcurrent, ATcurrent, SHcurrent;
 uchar ST[] = "ST:  . ";
@@ -49,9 +49,9 @@ uchar SH[] = "SH:  . ";
 uchar AT[] = "AT:  . ";
 uchar AH[] = "AH:  . ";
 uchar STrange[] = "R: none ";
-uchar SHrange[] = "R:40--80";
+uchar SHrange[] = "R:20--80";
 uchar ATrange[] = "R:20--30";
-uchar AHrange[] = "R:40--70";
+uchar AHrange[] = "R:10--70";
 
 void trans_num_to_char(uchar a, uchar *s)
 /* 将数字如SHmin转行到字符数字SH中的对应位置 */
@@ -488,7 +488,7 @@ void keyscan() //按键扫描函数
 			else if (num == 3)
 			{
 				ATmin--;
-				trans_num_to_char(ATmin, ATrange + 4);
+				trans_num_to_char(ATmin, ATrange + 2);
 				printrange();
 				lcd_pos(2, 5);
 			}
@@ -502,7 +502,7 @@ void keyscan() //按键扫描函数
 			else if (num == 5)
 			{
 				AHmin--;
-				trans_num_to_char(AHmin, AHrange + 4);
+				trans_num_to_char(AHmin, AHrange + 2);
 				printrange();
 				lcd_pos(3, 5);
 			}
@@ -664,6 +664,7 @@ int main()
 				lcd_wdat(AH[k]);
 			}
 			lcd_pos(3, 8); //将光标移动到显示区域外，防止乱码出现
+			// delayms(1500);
 		}
 	}
 }
