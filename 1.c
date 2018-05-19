@@ -11,10 +11,10 @@
 #define uint unsigned int
 
 #define LCD_data P0	//数据口
+sbit LCD_PSB = P3 ^ 3; //串/并方式控制
+sbit LCD_EN = P3 ^ 4;  //液晶使能控制
 sbit LCD_RS = P3 ^ 5;  //寄存器选择输入
 sbit LCD_RW = P3 ^ 6;  //液晶读/写控制
-sbit LCD_EN = P3 ^ 4;  //液晶使能控制
-sbit LCD_PSB = P3 ^ 7; //串/并方式控制
 
 sbit Buzzer = P2 ^ 0; //蜂鸣器
 sbit Data = P2 ^ 1;   //定义dh11数据线at and ah
@@ -41,7 +41,7 @@ sbit Pump = P1 ^ 3;
 	};
 
 uchar num = 0;
-uchar SHmin = 70, SHmax = 80, ATmin = 27, ATmax = 29, AHmin = 40, AHmax = 50;
+uchar SHmin = 40, SHmax = 80, ATmin = 20, ATmax = 30, AHmin = 40, AHmax = 70;
 unsigned int STcurrent;
 uchar AHcurrent, ATcurrent, SHcurrent;
 uchar ST[] = "ST:  . ";
@@ -49,9 +49,9 @@ uchar SH[] = "SH:  . ";
 uchar AT[] = "AT:  . ";
 uchar AH[] = "AH:  . ";
 uchar STrange[] = "R: none ";
-uchar SHrange[] = "R:45--50";
-uchar ATrange[] = "R:24--25";
-uchar AHrange[] = "R:20--30";
+uchar SHrange[] = "R:40--80";
+uchar ATrange[] = "R:20--30";
+uchar AHrange[] = "R:40--70";
 
 void trans_num_to_char(uchar a, uchar *s)
 /* 将数字如SHmin转行到字符数字SH中的对应位置 */
@@ -432,7 +432,7 @@ void keyscan() //按键扫描函数
 			else if (num == 3)
 			{
 				ATmin++;
-				trans_num_to_char(ATmin, ATrange + 4);
+				trans_num_to_char(ATmin, ATrange + 2);
 				printrange();
 				lcd_pos(2, 5);
 			}
@@ -446,7 +446,7 @@ void keyscan() //按键扫描函数
 			else if (num == 5)
 			{
 				AHmin++;
-				trans_num_to_char(AHmin, AHrange + 4);
+				trans_num_to_char(AHmin, AHrange + 2);
 				printrange();
 				lcd_pos(3, 5);
 			}
