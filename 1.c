@@ -18,7 +18,7 @@ sbit LCD_RW = P3 ^ 6;  //液晶读/写控制
 
 sbit Buzzer = P2 ^ 0; //蜂鸣器
 sbit Data = P2 ^ 1;   //定义dh11数据线at and ah
-sbit SHdata = P3 ^ 0; //土壤湿度模块
+sbit SHdata = P2 ^ 2; //土壤湿度模块
 sbit DQ = P2 ^ 3;	 //ds18b20信号位st
 
 sbit key1 = P1 ^ 4;
@@ -288,8 +288,23 @@ void loadcurrent(unsigned int a, uchar *p)
 /* 空气温度：ds18b20返回一个上百的数字，把这个数字转换成字符 */
 {
 	*(p + 3) = a / 100 + 48;
+	if (*(p + 3) == '0')
+	{
+		*(p + 3) = ' ';
+	}
 	*(p + 4) = (a / 10) % 10 + 48;
 	*(p + 6) = a % 10 + 48;
+}
+
+void loadcurrent_two(unsigned char a, uchar *p)
+{
+	*(p + 3) = (a / 10) + 48;
+	if (*(p + 3) == '0')
+	{
+		*(p + 3) = ' ';
+	}
+	*(p + 4) = a % 10 + 48;
+	*(p + 6) = '0';
 }
 
 void DHT11_delay_us(uchar n)
@@ -577,42 +592,49 @@ void compare()
 	}
 }
 
-// void receive_SH()
-// {
-// 	bit tmp;
-// 	uchar i;
-// 	for (i=0 ; i<8 ; i++ )
-// 	{
-// 		tmp=SHdata;
-// 		SHcurrent=SHcurrent|tmp;
-// 		SHcurrent=SHcurrent<<1;
-// 		delayms(200);
-// 	}
-// 	if (SHcurrent==65535)
-// 	{
-// 		SHcurrent=0;
-// 	}
-// 	if (SHcurrent>0&&SHcurrent<65535)
-// 	{
-// 		SHcurrent=30;
-// 	}
-// 	if (SHcurrent==0)
-// 	{
-// 		SHcurrent=46;
-// 	}
-// }
-
-void Initial_com(void)
+void receive_SH()
 {
-	EA = 1;		 //开总中断
-	ES = 1;		 //允许串口中断
-	ET1 = 1;	 //允许定时器T1的中断
-	TMOD = 0x20; //定时器T1，在方式2中断产生波特率
-	PCON = 0x00; //SMOD=0
-	SCON = 0x50; // 方式1 由定时器控制
-	TH1 = 0xfd;  //波特率设置为9600
-	TL1 = 0xfd;
-	TR1 = 1; //开定时器T1运行控制位
+	bit tmp;
+	uchar i, k;
+	for (i = 0; i < 8; i++)
+	{
+		tmp = SHdata;
+		if (tmp == 1)
+		{
+			k++;
+		}
+		delayms(20);
+	}
+	switch (k)
+	{
+	case 0:
+		SHcurrent = 99;
+		break;
+	case 1:
+		SHcurrent = 90;
+		break;
+	case 2:
+		SHcurrent = 80;
+		break;
+	case 3:
+		SHcurrent = 70;
+		break;
+	case 4:
+		SHcurrent = 60;
+		break;
+	case 5:
+		SHcurrent = 50;
+		break;
+	case 6:
+		SHcurrent = 30;
+		break;
+	case 7:
+		SHcurrent = 0;
+		break;
+	default:
+		SHcurrent = 0;
+		break;
+	}
 }
 
 int main()
@@ -622,7 +644,6 @@ int main()
 
 	lcd_init();		//初始化LCD
 	Init_DS18B20(); //初始化DS18B20
-	Initial_com();
 	while (1)
 	{
 		keyscan();
@@ -632,13 +653,9 @@ int main()
 		{
 			STcurrent = ReadTemperature();
 			loadcurrent(STcurrent, ST);
-			// receive_SH();
-			if (RI)
-			{
-				SHcurrent = SBUF;
-				RI = 0;
-			}
-			loadcurrent(SHcurrent, SH);
+
+			receive_SH();
+			loadcurrent_two(SHcurrent, SH);
 			/* 读取温度，并把st转成字符数字，加载近去 */
 			DHT11_receive();
 			compare();
@@ -664,7 +681,6 @@ int main()
 				lcd_wdat(AH[k]);
 			}
 			lcd_pos(3, 8); //将光标移动到显示区域外，防止乱码出现
-			// delayms(1500);
 		}
 	}
 }
