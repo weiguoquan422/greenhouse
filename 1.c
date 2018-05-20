@@ -18,7 +18,7 @@ sbit LCD_RW = P3 ^ 6;  //液晶读/写控制
 
 sbit Buzzer = P2 ^ 0; //蜂鸣器
 sbit Data = P2 ^ 1;   //定义dh11数据线at and ah
-sbit SHdata = P2 ^ 2; //土壤湿度模块
+sbit SHdata = P3 ^ 0; //土壤湿度模块
 sbit DQ = P2 ^ 3;	 //ds18b20信号位st
 
 sbit key1 = P1 ^ 4;
@@ -571,7 +571,7 @@ void compare()
 		Air_blower = 1;
 	}
 
-	if (SHcurrent > SHmin && SHcurrent < SHmax && ATcurrent > ATmin && ATcurrent < ATmax && AHcurrent > AHmin && AHcurrent < AHmax)
+	if (SHcurrent > SHmin && ATcurrent > ATmin && ATcurrent < ATmax && AHcurrent > AHmin && AHcurrent < AHmax)
 	{
 		Buzzer = 1;
 	}
