@@ -432,42 +432,60 @@ void keyscan() //按键扫描函数
 			}
 			else if (num == 1)
 			{
-				SHmin++;
+				if (SHmax - SHmin > 1)
+				{
+					SHmin++;
+				}
 				trans_num_to_char(SHmin, SHrange + 2);
 				printrange();
 				lcd_pos(1, 5);
 			}
 			else if (num == 2)
 			{
-				SHmax++;
+				if (SHmax < 99)
+				{
+					SHmax++;
+				}
 				trans_num_to_char(SHmax, SHrange + 6);
 				printrange();
 				lcd_pos(1, 7);
 			}
 			else if (num == 3)
 			{
-				ATmin++;
+				if (ATmax - ATmin > 1)
+				{
+					ATmin++;
+				}
 				trans_num_to_char(ATmin, ATrange + 2);
 				printrange();
 				lcd_pos(2, 5);
 			}
 			else if (num == 4)
 			{
-				ATmax++;
+				if (ATmax < 99)
+				{
+					ATmax++;
+				}
 				trans_num_to_char(ATmax, ATrange + 6);
 				printrange();
 				lcd_pos(2, 7);
 			}
 			else if (num == 5)
 			{
-				AHmin++;
+				if (AHmax - AHmin > 1)
+				{
+					AHmin++;
+				}
 				trans_num_to_char(AHmin, AHrange + 2);
 				printrange();
 				lcd_pos(3, 5);
 			}
 			else if (num == 6)
 			{
-				AHmax++;
+				if (AHmax < 99)
+				{
+					AHmax++;
+				}
 				trans_num_to_char(AHmax, AHrange + 6);
 				printrange();
 				lcd_pos(3, 7);
@@ -488,42 +506,60 @@ void keyscan() //按键扫描函数
 			}
 			else if (num == 1)
 			{
-				SHmin--;
+				if (SHmin > 10)
+				{
+					SHmin--;
+				}
 				trans_num_to_char(SHmin, SHrange + 2);
 				printrange();
 				lcd_pos(1, 5);
 			}
 			else if (num == 2)
 			{
-				SHmax--;
+				if (SHmax - SHmin > 1)
+				{
+					SHmax--;
+				}
 				trans_num_to_char(SHmax, SHrange + 6);
 				printrange();
 				lcd_pos(1, 7);
 			}
 			else if (num == 3)
 			{
-				ATmin--;
+				if (ATmin > 0)
+				{
+					ATmin--;
+				}
 				trans_num_to_char(ATmin, ATrange + 2);
 				printrange();
 				lcd_pos(2, 5);
 			}
 			else if (num == 4)
 			{
-				ATmax--;
+				if (ATmax - ATmin > 1)
+				{
+					ATmax--;
+				}
 				trans_num_to_char(ATmax, ATrange + 6);
 				printrange();
 				lcd_pos(2, 7);
 			}
 			else if (num == 5)
 			{
-				AHmin--;
+				if (AHmin > 0)
+				{
+					AHmin--;
+				}
 				trans_num_to_char(AHmin, AHrange + 2);
 				printrange();
 				lcd_pos(3, 5);
 			}
 			else if (num == 6)
 			{
-				AHmax--;
+				if (AHmax - AHmin > 1)
+				{
+					AHmax--;
+				}
 				trans_num_to_char(AHmax, AHrange + 6);
 				printrange();
 				lcd_pos(3, 7);
@@ -608,31 +644,31 @@ void receive_SH()
 	switch (k)
 	{
 	case 0:
-		SHcurrent = 99;
+		SHcurrent = (SHmax + SHmin) / 2;
 		break;
 	case 1:
-		SHcurrent = 90;
+		SHcurrent = (SHmax + SHmin) / 2;
 		break;
 	case 2:
-		SHcurrent = 80;
+		SHcurrent = SHmin - 10;
 		break;
 	case 3:
-		SHcurrent = 70;
+		SHcurrent = SHmin - 10;
 		break;
 	case 4:
-		SHcurrent = 60;
+		SHcurrent = SHmin - 10;
 		break;
 	case 5:
-		SHcurrent = 50;
+		SHcurrent = SHmin - 10;
 		break;
 	case 6:
-		SHcurrent = 30;
+		SHcurrent = SHmin - 10;
 		break;
 	case 7:
-		SHcurrent = 0;
+		SHcurrent = SHmin - 10;
 		break;
 	default:
-		SHcurrent = 0;
+		SHcurrent = SHmin - 10;
 		break;
 	}
 }
