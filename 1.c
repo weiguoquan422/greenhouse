@@ -639,7 +639,7 @@ void receive_SH()
 		{
 			k++;
 		}
-		delayms(20);
+		delayms(10);
 	}
 	switch (k)
 	{
