@@ -394,7 +394,10 @@ void keyscan() //按键扫描函数
 		delayms(10);
 		if (key2 == 0)
 		{
-			num2 = 1;
+			if (num != 0)
+			{
+				num2 = 1;
+			}
 			while (!key2)
 				;
 		}
@@ -405,7 +408,10 @@ void keyscan() //按键扫描函数
 		delayms(10);
 		if (key3 == 0)
 		{
-			num3 = 1;
+			if (num != 0)
+			{
+				num3 = 1;
+			}
 			while (!key3)
 				;
 		}
