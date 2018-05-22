@@ -40,7 +40,8 @@ sbit Pump = P1 ^ 3;
 		_nop_();   \
 	};
 
-uchar num = 0, num2 = 0, num3 = 0;
+uchar num = 0, num2 = 0, num3 = 0; //num,num2,num3分别是按键1,2,3按下后改变的参数，用这些参数的变化通过keyload函数使按键显示在lcd上
+uchar flag = 0;
 uchar SHmin = 20, SHmax = 80, ATmin = 20, ATmax = 30, AHmin = 10, AHmax = 70;
 unsigned int STcurrent;
 uchar AHcurrent, ATcurrent, SHcurrent;
@@ -384,6 +385,7 @@ void keyscan() //按键扫描函数
 		if (key1 == 0)
 		{
 			num++;
+			flag = 1;
 			while (!key1)
 				;
 		}
@@ -426,7 +428,11 @@ void keyload()
 	}
 	else if (num == 1)
 	{
-		lcd_pos(1, 5);
+		if (flag == 1)
+		{
+			lcd_pos(1, 5);
+			flag = 0;
+		}
 		if (num2)
 		{
 			if (SHmax - SHmin > 1)
@@ -434,6 +440,9 @@ void keyload()
 				SHmin++;
 			}
 			num2 = 0;
+			trans_num_to_char(SHmin, SHrange + 2);
+			printrange();
+			lcd_pos(1, 5);
 		}
 		if (num3)
 		{
@@ -442,14 +451,18 @@ void keyload()
 				SHmin--;
 			}
 			num3 = 0;
+			trans_num_to_char(SHmin, SHrange + 2);
+			printrange();
+			lcd_pos(1, 5);
 		}
-		trans_num_to_char(SHmin, SHrange + 2);
-		printrange();
-		lcd_pos(1, 5);
 	}
 	else if (num == 2)
 	{
-		lcd_pos(1, 7);
+		if (flag == 1)
+		{
+			lcd_pos(1, 7);
+			flag = 0;
+		}
 		if (num2)
 		{
 			if (SHmax < 99)
@@ -457,6 +470,9 @@ void keyload()
 				SHmax++;
 			}
 			num2 = 0;
+			trans_num_to_char(SHmax, SHrange + 6);
+			printrange();
+			lcd_pos(1, 7);
 		}
 		if (num3)
 		{
@@ -465,14 +481,18 @@ void keyload()
 				SHmax--;
 			}
 			num3 = 0;
+			trans_num_to_char(SHmax, SHrange + 6);
+			printrange();
+			lcd_pos(1, 7);
 		}
-		trans_num_to_char(SHmax, SHrange + 6);
-		printrange();
-		lcd_pos(1, 7);
 	}
 	else if (num == 3)
 	{
-		lcd_pos(2, 5);
+		if (flag == 1)
+		{
+			lcd_pos(2, 5);
+			flag = 0;
+		}
 		if (num2)
 		{
 			if (ATmax - ATmin > 1)
@@ -480,6 +500,9 @@ void keyload()
 				ATmin++;
 			}
 			num2 = 0;
+			trans_num_to_char(ATmin, ATrange + 2);
+			printrange();
+			lcd_pos(2, 5);
 		}
 		if (num3)
 		{
@@ -488,14 +511,18 @@ void keyload()
 				ATmin--;
 			}
 			num3 = 0;
+			trans_num_to_char(ATmin, ATrange + 2);
+			printrange();
+			lcd_pos(2, 5);
 		}
-		trans_num_to_char(ATmin, ATrange + 2);
-		printrange();
-		lcd_pos(2, 5);
 	}
 	else if (num == 4)
 	{
-		lcd_pos(2, 7);
+		if (flag == 1)
+		{
+			lcd_pos(2, 7);
+			flag = 0;
+		}
 		if (num2)
 		{
 			if (ATmax < 99)
@@ -503,6 +530,9 @@ void keyload()
 				ATmax++;
 			}
 			num2 = 0;
+			trans_num_to_char(ATmax, ATrange + 6);
+			printrange();
+			lcd_pos(2, 7);
 		}
 		if (num3)
 		{
@@ -511,14 +541,18 @@ void keyload()
 				ATmax--;
 			}
 			num3 = 0;
+			trans_num_to_char(ATmax, ATrange + 6);
+			printrange();
+			lcd_pos(2, 7);
 		}
-		trans_num_to_char(ATmax, ATrange + 6);
-		printrange();
-		lcd_pos(2, 7);
 	}
 	else if (num == 5)
 	{
-		lcd_pos(3, 5);
+		if (flag == 1)
+		{
+			lcd_pos(3, 5);
+			flag = 0;
+		}
 		if (num2)
 		{
 			if (AHmax - AHmin > 1)
@@ -526,6 +560,9 @@ void keyload()
 				AHmin++;
 			}
 			num2 = 0;
+			trans_num_to_char(AHmin, AHrange + 2);
+			printrange();
+			lcd_pos(3, 5);
 		}
 		if (num3)
 		{
@@ -534,14 +571,18 @@ void keyload()
 				AHmin--;
 			}
 			num3 = 0;
+			trans_num_to_char(AHmin, AHrange + 2);
+			printrange();
+			lcd_pos(3, 5);
 		}
-		trans_num_to_char(AHmin, AHrange + 2);
-		printrange();
-		lcd_pos(3, 5);
 	}
 	else if (num == 6)
 	{
-		lcd_pos(3, 7);
+		if (flag == 1)
+		{
+			lcd_pos(3, 7);
+			flag = 0;
+		}
 		if (num2)
 		{
 			if (AHmax < 99)
@@ -549,6 +590,9 @@ void keyload()
 				AHmax++;
 			}
 			num2 = 0;
+			trans_num_to_char(AHmax, AHrange + 6);
+			printrange();
+			lcd_pos(3, 7);
 		}
 		if (num3)
 		{
@@ -557,10 +601,10 @@ void keyload()
 				AHmax--;
 			}
 			num3 = 0;
+			trans_num_to_char(AHmax, AHrange + 6);
+			printrange();
+			lcd_pos(3, 7);
 		}
-		trans_num_to_char(AHmax, AHrange + 6);
-		printrange();
-		lcd_pos(3, 7);
 	}
 	else if (num == 7)
 	{
