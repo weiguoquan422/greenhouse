@@ -40,7 +40,7 @@ sbit Pump = P1 ^ 3;
 		_nop_();   \
 	};
 
-uchar num = 0;
+uchar num = 0, num2 = 0, num3 = 0;
 uchar SHmin = 20, SHmax = 80, ATmin = 20, ATmax = 30, AHmin = 10, AHmax = 70;
 unsigned int STcurrent;
 uchar AHcurrent, ATcurrent, SHcurrent;
@@ -384,38 +384,6 @@ void keyscan() //按键扫描函数
 		if (key1 == 0)
 		{
 			num++;
-			if (num == 0)
-			{
-				lcd_wcmd(0x0c);
-			}
-			else if (num == 1)
-			{
-				lcd_pos(1, 5);
-			}
-			else if (num == 2)
-			{
-				lcd_pos(1, 7);
-			}
-			else if (num == 3)
-			{
-				lcd_pos(2, 5);
-			}
-			else if (num == 4)
-			{
-				lcd_pos(2, 7);
-			}
-			else if (num == 5)
-			{
-				lcd_pos(3, 5);
-			}
-			else if (num == 6)
-			{
-				lcd_pos(3, 7);
-			}
-			else if (num == 7)
-			{
-				num = 0;
-			}
 			while (!key1)
 				;
 		}
@@ -426,70 +394,7 @@ void keyscan() //按键扫描函数
 		delayms(10);
 		if (key2 == 0)
 		{
-			if (num == 0)
-			{
-				lcd_wcmd(0x0c);
-			}
-			else if (num == 1)
-			{
-				if (SHmax - SHmin > 1)
-				{
-					SHmin++;
-				}
-				trans_num_to_char(SHmin, SHrange + 2);
-				printrange();
-				lcd_pos(1, 5);
-			}
-			else if (num == 2)
-			{
-				if (SHmax < 99)
-				{
-					SHmax++;
-				}
-				trans_num_to_char(SHmax, SHrange + 6);
-				printrange();
-				lcd_pos(1, 7);
-			}
-			else if (num == 3)
-			{
-				if (ATmax - ATmin > 1)
-				{
-					ATmin++;
-				}
-				trans_num_to_char(ATmin, ATrange + 2);
-				printrange();
-				lcd_pos(2, 5);
-			}
-			else if (num == 4)
-			{
-				if (ATmax < 99)
-				{
-					ATmax++;
-				}
-				trans_num_to_char(ATmax, ATrange + 6);
-				printrange();
-				lcd_pos(2, 7);
-			}
-			else if (num == 5)
-			{
-				if (AHmax - AHmin > 1)
-				{
-					AHmin++;
-				}
-				trans_num_to_char(AHmin, AHrange + 2);
-				printrange();
-				lcd_pos(3, 5);
-			}
-			else if (num == 6)
-			{
-				if (AHmax < 99)
-				{
-					AHmax++;
-				}
-				trans_num_to_char(AHmax, AHrange + 6);
-				printrange();
-				lcd_pos(3, 7);
-			}
+			num2 = 1;
 			while (!key2)
 				;
 		}
@@ -500,83 +405,160 @@ void keyscan() //按键扫描函数
 		delayms(10);
 		if (key3 == 0)
 		{
-			if (num == 0)
-			{
-				lcd_wcmd(0x0c);
-			}
-			else if (num == 1)
-			{
-				if (SHmin > 10)
-				{
-					SHmin--;
-				}
-				trans_num_to_char(SHmin, SHrange + 2);
-				printrange();
-				lcd_pos(1, 5);
-			}
-			else if (num == 2)
-			{
-				if (SHmax - SHmin > 1)
-				{
-					SHmax--;
-				}
-				trans_num_to_char(SHmax, SHrange + 6);
-				printrange();
-				lcd_pos(1, 7);
-			}
-			else if (num == 3)
-			{
-				if (ATmin > 0)
-				{
-					ATmin--;
-				}
-				trans_num_to_char(ATmin, ATrange + 2);
-				printrange();
-				lcd_pos(2, 5);
-			}
-			else if (num == 4)
-			{
-				if (ATmax - ATmin > 1)
-				{
-					ATmax--;
-				}
-				trans_num_to_char(ATmax, ATrange + 6);
-				printrange();
-				lcd_pos(2, 7);
-			}
-			else if (num == 5)
-			{
-				if (AHmin > 0)
-				{
-					AHmin--;
-				}
-				trans_num_to_char(AHmin, AHrange + 2);
-				printrange();
-				lcd_pos(3, 5);
-			}
-			else if (num == 6)
-			{
-				if (AHmax - AHmin > 1)
-				{
-					AHmax--;
-				}
-				trans_num_to_char(AHmax, AHrange + 6);
-				printrange();
-				lcd_pos(3, 7);
-			}
+			num3 = 1;
 			while (!key3)
 				;
 		}
 	}
+}
 
-	if (key4 == 0)
+void keyload()
+{
+	if (num == 0)
 	{
-		delayms(10);
-		if (key4 == 0)
+		lcd_wcmd(0x0c);
+	}
+	else if (num == 1)
+	{
+		lcd_pos(1, 5);
+		if (num2)
 		{
-			while (!key4)
-				;
+			if (SHmax - SHmin > 1)
+			{
+				SHmin++;
+			}
+			num2 = 0;
 		}
+		if (num3)
+		{
+			if (SHmin > 10)
+			{
+				SHmin--;
+			}
+			num3 = 0;
+		}
+		trans_num_to_char(SHmin, SHrange + 2);
+		printrange();
+		lcd_pos(1, 5);
+	}
+	else if (num == 2)
+	{
+		lcd_pos(1, 7);
+		if (num2)
+		{
+			if (SHmax < 99)
+			{
+				SHmax++;
+			}
+			num2 = 0;
+		}
+		if (num3)
+		{
+			if (SHmax - SHmin > 1)
+			{
+				SHmax--;
+			}
+			num3 = 0;
+		}
+		trans_num_to_char(SHmax, SHrange + 6);
+		printrange();
+		lcd_pos(1, 7);
+	}
+	else if (num == 3)
+	{
+		lcd_pos(2, 5);
+		if (num2)
+		{
+			if (ATmax - ATmin > 1)
+			{
+				ATmin++;
+			}
+			num2 = 0;
+		}
+		if (num3)
+		{
+			if (ATmin > 0)
+			{
+				ATmin--;
+			}
+			num3 = 0;
+		}
+		trans_num_to_char(ATmin, ATrange + 2);
+		printrange();
+		lcd_pos(2, 5);
+	}
+	else if (num == 4)
+	{
+		lcd_pos(2, 7);
+		if (num2)
+		{
+			if (ATmax < 99)
+			{
+				ATmax++;
+			}
+			num2 = 0;
+		}
+		if (num3)
+		{
+			if (ATmax - ATmin > 1)
+			{
+				ATmax--;
+			}
+			num3 = 0;
+		}
+		trans_num_to_char(ATmax, ATrange + 6);
+		printrange();
+		lcd_pos(2, 7);
+	}
+	else if (num == 5)
+	{
+		lcd_pos(3, 5);
+		if (num2)
+		{
+			if (AHmax - AHmin > 1)
+			{
+				AHmin++;
+			}
+			num2 = 0;
+		}
+		if (num3)
+		{
+			if (AHmin > 0)
+			{
+				AHmin--;
+			}
+			num3 = 0;
+		}
+		trans_num_to_char(AHmin, AHrange + 2);
+		printrange();
+		lcd_pos(3, 5);
+	}
+	else if (num == 6)
+	{
+		lcd_pos(3, 7);
+		if (num2)
+		{
+			if (AHmax < 99)
+			{
+				AHmax++;
+			}
+			num2 = 0;
+		}
+		if (num3)
+		{
+			if (AHmax - AHmin > 1)
+			{
+				AHmax--;
+			}
+			num3 = 0;
+		}
+		trans_num_to_char(AHmax, AHrange + 6);
+		printrange();
+		lcd_pos(3, 7);
+	}
+	else if (num == 7)
+	{
+		num = 0;
 	}
 }
 
@@ -683,6 +665,7 @@ int main()
 	while (1)
 	{
 		keyscan();
+		keyload();
 
 		if (num == 0)
 		/* num=0时，温室处于工作状态，num不等于0时，处于设定range状态，温室不工作 */
