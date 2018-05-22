@@ -198,8 +198,8 @@ void lcd_init()
 	delay(5);
 	lcd_wcmd(0x01); //清除显示
 	delay(5);
-	lcd_wcmd(0x0d);
-	//显示开，关游标，但开光标位置，即光标会显示，但不会随着输入自动变化位置。对之后键盘控制很重要
+	lcd_wcmd(0x0f);
+	//显示开，开光标
 	delay(5);
 	printrange();
 	/*lcd_wcmd(0x0f); //显示开，开光标
@@ -385,6 +385,10 @@ void keyscan() //按键扫描函数
 		if (key1 == 0)
 		{
 			num++;
+			if (num == 7)
+			{
+				num = 0;
+			}
 			flag = 1;
 			while (!key1)
 				;
@@ -428,6 +432,7 @@ void keyload()
 	}
 	else if (num == 1)
 	{
+		lcd_wcmd(0x0f);
 		if (flag == 1)
 		{
 			lcd_pos(1, 5);
@@ -458,6 +463,7 @@ void keyload()
 	}
 	else if (num == 2)
 	{
+		lcd_wcmd(0x0f);
 		if (flag == 1)
 		{
 			lcd_pos(1, 7);
@@ -488,6 +494,7 @@ void keyload()
 	}
 	else if (num == 3)
 	{
+		lcd_wcmd(0x0f);
 		if (flag == 1)
 		{
 			lcd_pos(2, 5);
@@ -518,6 +525,7 @@ void keyload()
 	}
 	else if (num == 4)
 	{
+		lcd_wcmd(0x0f);
 		if (flag == 1)
 		{
 			lcd_pos(2, 7);
@@ -548,6 +556,7 @@ void keyload()
 	}
 	else if (num == 5)
 	{
+		lcd_wcmd(0x0f);
 		if (flag == 1)
 		{
 			lcd_pos(3, 5);
@@ -578,6 +587,7 @@ void keyload()
 	}
 	else if (num == 6)
 	{
+		lcd_wcmd(0x0f);
 		if (flag == 1)
 		{
 			lcd_pos(3, 7);
@@ -605,10 +615,6 @@ void keyload()
 			printrange();
 			lcd_pos(3, 7);
 		}
-	}
-	else if (num == 7)
-	{
-		num = 0;
 	}
 }
 
@@ -727,7 +733,7 @@ int main()
 			loadcurrent_two(SHcurrent, SH);
 			/* 读取温度，并把st转成字符数字，加载近去 */
 			DHT11_receive();
-			compare();
+			// compare();
 
 			lcd_pos(0, 0); //设置显示位置为第1行的第1个字符
 			for (k = 0; k < 7; k++)
