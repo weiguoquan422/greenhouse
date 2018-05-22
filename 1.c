@@ -733,7 +733,7 @@ int main()
 			loadcurrent_two(SHcurrent, SH);
 			/* 读取温度，并把st转成字符数字，加载近去 */
 			DHT11_receive();
-			// compare();
+			compare();
 
 			lcd_pos(0, 0); //设置显示位置为第1行的第1个字符
 			for (k = 0; k < 7; k++)
