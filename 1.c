@@ -40,9 +40,10 @@ sbit Pump = P1 ^ 3;
 		_nop_();   \
 	};
 
-uchar num = 0, num2 = 0, num3 = 0; //num,num2,num3分别是按键1,2,3按下后改变的参数，用这些参数的变化通过keyload函数使按键显示在lcd上
+uchar num = 0, num1 = 0, num2 = 0, num3 = 0; //num,num2,num3分别是按键1,2,3按下后改变的参数，用这些参数的变化通过keyload函数使按键显示在lcd上,num1是中断函数的参数
 uchar flag = 0;
-uchar SHmin = 20, SHmax = 80, ATmin = 20, ATmax = 30, AHmin = 10, AHmax = 70;
+uchar Buzzerflag = 1;
+uchar SHmin = 20, SHmax = 80, ATmin = 20, ATmax = 40, AHmin = 10, AHmax = 70;
 unsigned int STcurrent;
 uchar AHcurrent, ATcurrent, SHcurrent;
 uchar ST[] = "ST:  . ";
@@ -51,7 +52,7 @@ uchar AT[] = "AT:  . ";
 uchar AH[] = "AH:  . ";
 uchar STrange[] = "R: none ";
 uchar SHrange[] = "R:20--80";
-uchar ATrange[] = "R:20--30";
+uchar ATrange[] = "R:20--40";
 uchar AHrange[] = "R:10--70";
 
 void trans_num_to_char(uchar a, uchar *s)
@@ -623,7 +624,7 @@ void compare()
 	if (SHcurrent <= SHmin)
 	{
 		Pump = 0;
-		Buzzer = 0;
+		Buzzerflag = 0;
 	}
 	else
 	{
@@ -633,7 +634,7 @@ void compare()
 	if (ATcurrent <= ATmin)
 	{
 		Heater = 0;
-		Buzzer = 0;
+		Buzzerflag = 0;
 	}
 	else
 	{
@@ -643,7 +644,7 @@ void compare()
 	if (AHcurrent <= AHmin)
 	{
 		Sprayer = 0;
-		Buzzer = 0;
+		Buzzerflag = 0;
 	}
 	else
 	{
@@ -653,7 +654,7 @@ void compare()
 	if (ATcurrent >= ATmax || AHcurrent >= AHmax)
 	{
 		Air_blower = 0;
-		Buzzer = 0;
+		Buzzerflag = 0;
 	}
 	else
 	{
@@ -663,6 +664,7 @@ void compare()
 	if (SHcurrent > SHmin && ATcurrent > ATmin && ATcurrent < ATmax && AHcurrent > AHmin && AHcurrent < AHmax)
 	{
 		Buzzer = 1;
+		Buzzerflag = 1;
 	}
 }
 
@@ -711,11 +713,22 @@ void receive_SH()
 	}
 }
 
+void init_timer()
+{
+	TMOD = 0x01;
+	TH0 = (65536 - 45872) / 256;
+	TL0 = (65536 - 45872) % 256;
+	EA = 1;
+	ET0 = 1;
+	TR0 = 1;
+}
+
 int main()
 {
 	uchar k;
 	delay(10); //延时函数
 
+	init_timer();
 	lcd_init();		//初始化LCD
 	Init_DS18B20(); //初始化DS18B20
 	while (1)
@@ -756,6 +769,26 @@ int main()
 				lcd_wdat(AH[k]);
 			}
 			lcd_pos(3, 8); //将光标移动到显示区域外，防止乱码出现
+			delay(10);
+		}
+	}
+}
+
+void t0_time() interrupt 1
+
+{
+	TH0 = (65536 - 45872) / 256;
+	TL0 = (65536 - 45872) % 256;
+	if (Buzzerflag == 0)
+	{
+		num1++;
+		if (num1 == 21)
+		{
+			num1 = 0;
+		}
+		if (num1 == 10)
+		{
+			Buzzer = ~Buzzer;
 		}
 	}
 }
